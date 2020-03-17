@@ -14,16 +14,20 @@ const router = new VueRouter({
       path:'/',
       redirect:'/login'
     },
+    //命名路由 指定name
     {
       path: '/login',
+      name:'login',
       component: Login
     },
     {
       path :'/register',
+      name:'register',
       component: Register
     },
     {
       path:'/user',
+      name:'user',
       component:User
     }
   ]

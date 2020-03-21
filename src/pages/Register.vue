@@ -78,7 +78,7 @@ export default {
             name: 'login',
             params: { username: this.username, password: this.password }
           })
-        } else {
+          } else {
           this.$toast.fail(res.data.message)
         }
       })

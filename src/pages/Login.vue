@@ -53,9 +53,13 @@ export default {
         }
       }).then(res => {
         console.log(res.data)
+        const { statusCode, data, message } = res.data
         if (res.data.statusCode === 200) {
           // alert('恭喜登录成功')
           this.$toast.success('登录成功了')
+          //保存登录的token和用户信息
+          localStorage.setItem('token', data.token)
+          localStorage.setItem('user_id', data.user.id)
           //如果登录成功了，需要跳转到个人中心
           this.$router.push('/user')
         } else {
@@ -71,9 +75,9 @@ export default {
     }
   },
   created() {
-    // console.log(this.$route)
-    this.username = this.$router.params.username
-    this.password = this.$router.params.password
+    console.log(this.$route)
+    this.username = this.$route.params.username
+    this.password = this.$route.params.password
   }
 }
 </script>

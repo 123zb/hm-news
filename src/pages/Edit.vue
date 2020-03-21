@@ -5,11 +5,7 @@
     <div class="avatar">
       <img :src="$axios.defaults.baseURL + info.head_img" alt />
       <!-- 上传头像的组件 -->
-      <van-uploader
-        class="uploader"
-        :before-read="beforeRead"
-        :after-read="afterRead"
-      />
+      <van-uploader class="uploader" :after-read="afterRead" />
     </div>
     <hm-navbar
       title="昵称"
@@ -67,13 +63,18 @@
       </van-radio-group>
     </van-dialog>
 
-
     <div class="cropper-mask" v-show="showCropper">
-      <vue-cropper></vue-cropper>
+      <vue-cropper
+        ref="cropper"
+        :img="img"
+        :autoCrop="true"
+        :autoCropWidth="150"
+        :autoCropHeight="150"
+        :fixed="true"
+      ></vue-cropper>
+      <van-button class="crop" type="primary" @click="crop">裁剪</van-button>
+      <van-button class="cancel" type="info" @click="cancel">取消</van-button>
     </div>
-
-
-
   </div>
 </template>
 
@@ -93,7 +94,8 @@ export default {
       password: '',
       show2: false,
       gender: 1,
-      showCropper:false
+      showCropper: false,
+      img: ''
     }
   },
   created() {
@@ -212,34 +214,68 @@ export default {
     },
     afterRead(file) {
       //需要异步的上传文件
-      const fd = new FormData()
-      fd.append('file', file.file)
-      this.$axios({
-        method: 'post',
-        url: '/upload',
-        data: fd,
-        headers: {
-          Authorization: localStorage.getItem('token')
-        }
-      }).then(res => {
-        const { statusCode, data } = res.data
-        if (statusCode === 200) {
-          this.editUser({
-            head_img: data.url
-          })
-        }
-      })
+
+      //读取完这个文件就需要上传这个文件
+      this.showCropper = true
+      this.img = file.content
+
+      // const fd = new FormData()
+      // fd.append('file', file.file)
+      // this.$axios({
+      //   method: 'post',
+      //   url: '/upload',
+      //   data: fd,
+      //   headers: {
+      //     Authorization: localStorage.getItem('token')
+      //   }
+      // }).then(res => {
+      //   const { statusCode, data } = res.data
+      //   if (statusCode === 200) {
+      //     this.editUser({
+      //       head_img: data.url
+      //     })
+      //   }
+      // })
     },
     beforeRead(file) {
-      if (file.size / 1024 >= 200) {
-        this.$toast.fail('文件大小不能超过200kb')
-        return false
-      }
-      if (file.type !== 'image/jpge') {
-        this.$toast.fail('上传的文件必须是jpg文件')
-        return false
-      }
+      // if (file.size / 1024 >= 200) {
+      //   this.$toast.fail('文件大小不能超过200kb')
+      //   return false
+      // }
+      // if (file.type !== 'image/jpge') {
+      //   this.$toast.fail('上传的文件必须是jpg文件')
+      //   return false
+      // }
       return true
+    },
+    cancel() {
+      //取消裁剪
+      this.showCropper = false
+      this.img = ''
+    },
+    crop() {
+      this.$refs.cropper.getCropBlob(data => {
+        //把裁剪出来的图片进行上传
+        const fd = new FormData()
+        fd.append('file', data)
+        this.$axios({
+          method: 'post',
+          url: '/upload',
+          data: fd
+        }).then(res => {
+          const { statusCode, data } = res.data
+          if (statusCode === 200) {
+            //隐藏裁剪框
+            this.showCropper = false
+            //把裁剪的图片地址清除
+            this.img = ''
+            //修改头像
+            this.editUser({
+              head_img: data.url
+            })
+          }
+        })
+      })
     }
   },
   filters: {
@@ -284,11 +320,21 @@ export default {
 }
 .cropper-mask {
   position: fixed;
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  height: 100%;
   z-index: 999;
   top: 0;
   left: 0;
-
+  .crop,
+  .cancel {
+    position: absolute;
+    top: 0;
+  }
+  .crop {
+    left: 0;
+  }
+  .cancel {
+    right: 0;
+  }
 }
 </style>

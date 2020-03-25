@@ -35,7 +35,7 @@ import axios from 'axios'
 export default {
   methods: {
     //给DEM注册的时间，可以通过DOM的凡是触发
-    login() {
+    async login() {
       //做一个表单校验
       const result1 = this.$refs.username.validate(this.username)
       const result2 = this.$refs.password.validate(this.password)
@@ -44,28 +44,27 @@ export default {
       }
 
       // console.log('我要登陆了')
-      this.$axios({
+      const res = await this.$axios({
         method: 'post',
         url: '/login',
         data: {
           username: this.username,
           password: this.password
         }
-      }).then(res => {
-        console.log(res.data)
-        const { statusCode, data, message } = res.data
-        if (res.data.statusCode === 200) {
-          // alert('恭喜登录成功')
-          this.$toast.success('登录成功了')
-          //保存登录的token和用户信息
-          localStorage.setItem('token', data.token)
-          localStorage.setItem('user_id', data.user.id)
-          //如果登录成功了，需要跳转到个人中心
-          this.$router.push('/user')
-        } else {
-          this.$toast.fail('用户名或密码错误')
-        }
       })
+
+      const { statusCode, data, message } = res.data
+      if (res.data.statusCode === 200) {
+        // alert('恭喜登录成功')
+        this.$toast.success('登录成功了')
+        //保存登录的token和用户信息
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user_id', data.user.id)
+        //如果登录成功了，需要跳转到个人中心
+        this.$router.push('/user')
+      } else {
+        this.$toast.fail('用户名或密码错误')
+      }
     }
   },
   data() {

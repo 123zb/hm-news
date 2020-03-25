@@ -35,7 +35,18 @@ Vue.component('hm-navbar', hmNavbar)
 // Vue.use(Vant)
 
 //按需加载的方式
-import { Button, Field, Toast, Dialog,Radio,RadioGroup,Cell,CellGroup,Uploader } from 'vant'
+import {
+  Button,
+  Field,
+  Toast,
+  Dialog,
+  Radio,
+  RadioGroup,
+  Cell,
+  CellGroup,
+  Uploader,
+  List
+} from 'vant'
 Vue.use(Button)
 Vue.use(Field)
 Vue.use(Toast)
@@ -45,6 +56,7 @@ Vue.use(RadioGroup)
 Vue.use(Cell)
 Vue.use(CellGroup)
 Vue.use(Uploader)
+Vue.use(List)
 
 //axios的优化
 //aioxs和vue没有关系，强行让axios和vue有关系
@@ -68,20 +80,19 @@ axios.interceptors.response.use(function(res) {
 })
 
 //axios的请求拦截器，所有axios的请求都会先经过axios的请求拦截器
-axios.interceptors.request.use(function(config){
-//同一的给请求添加token
-const token = localStorage.getItem('token')
-config.headers.Authorization = token
+axios.interceptors.request.use(function(config) {
+  //同一的给请求添加token
+  const token = localStorage.getItem('token')
+  config.headers.Authorization = token
   return config
 })
-
 
 Vue.prototype.$axios = axios
 
 //---------------------全局过滤器----------------
 import moment from 'moment'
-Vue.filter('date', function(input) {
-  return moment(input).format('YYYY-MM-DD')
+Vue.filter('date', function(input, format = 'YYYY-MM-DD') {
+  return moment(input).format(format)
 })
 
 Vue.config.productionTip = false

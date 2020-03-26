@@ -21,12 +21,14 @@ import HmLogo from './components/HmLogo'
 import HmButton from './components/HmButton'
 import HmInput from './components/HmInput.vue'
 import hmNavbar from './components/HmNavbar.vue'
+import HmPost from './components/HmPost.vue'
 
 Vue.component('hm-header', HmHeader)
 Vue.component('hm-logo', HmLogo)
 Vue.component('hm-button', HmButton)
 Vue.component('hm-input', HmInput)
 Vue.component('hm-navbar', hmNavbar)
+Vue.component('hm-post', HmPost)
 
 //------------------vant-ui的处理-------------------
 // import Vant from 'vant'
@@ -45,7 +47,9 @@ import {
   Cell,
   CellGroup,
   Uploader,
-  List
+  List,
+  Tab,
+  Tabs
 } from 'vant'
 Vue.use(Button)
 Vue.use(Field)
@@ -57,6 +61,8 @@ Vue.use(Cell)
 Vue.use(CellGroup)
 Vue.use(Uploader)
 Vue.use(List)
+Vue.use(Tab)
+Vue.use(Tabs)
 
 //axios的优化
 //aioxs和vue没有关系，强行让axios和vue有关系
@@ -68,7 +74,7 @@ axios.interceptors.response.use(function(res) {
   const { statusCode, message } = res.data
   if (statusCode === 401 && message === '用户信息验证失败') {
     //说明token是验证失败的  跳转到login
-    router.push('/login')
+    router.push({ name: 'login'})
     //删除过期的token信息
     localStorage.removeItem('token')
     localStorage.removeItem('user_id')
@@ -83,7 +89,10 @@ axios.interceptors.response.use(function(res) {
 axios.interceptors.request.use(function(config) {
   //同一的给请求添加token
   const token = localStorage.getItem('token')
-  config.headers.Authorization = token
+  //如果token，我们给请求添加token
+  if (token) {
+    config.headers.Authorization = token
+  }
   return config
 })
 

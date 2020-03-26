@@ -60,10 +60,18 @@ export default {
         //保存登录的token和用户信息
         localStorage.setItem('token', data.token)
         localStorage.setItem('user_id', data.user.id)
-        //如果登录成功了，需要跳转到个人中心
-        this.$router.push('/user')
+        //如果登录成功了，需要跳转到个人中心，也可能会跳
+        // this.$router.push('/user')
+
+
+
+        if (this.$route.params.back) {
+          this.$router.back()
+        }else{
+          this.$router.push('/user')
+        }
       } else {
-        this.$toast.fail('用户名或密码错误')
+        this.$toast.fail('message')
       }
     }
   },
